@@ -1,2 +1,2 @@
-# evolutiva-avaliacao
-Repositório para deploy na community cloud do Streamlit
+# Avaliacao
+Repositório para testes da plataforma de avaliação no streamlit

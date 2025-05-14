@@ -1,0 +1,16 @@
+.stExpander{
+    background-color: rgb(255, 153, 0);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.stButton > button{
+    background-color: rgb(255, 136, 0);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.stButton > button:hover{
+    background-color: rgb(166, 255, 0);
+}
