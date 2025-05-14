@@ -5,7 +5,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.data_manager import create_dataframes,calcular_desempenho
+from utils.data_manager import create_dataframes, load_or_create_dataframes, calcular_desempenho
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -16,14 +16,25 @@ with open("styles.css") as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Cabeçalho para mudança de tela (opção de cadastro de aluno, cadastro de escola, consulta de aluno, acesso a material didático, acesso a provas, acesso a gabaritos)
+# Adicionar logo no canto superior esquerdo
+# Carregar ou criar os dataframes
+with st.spinner("Carregando dados..."):
+    dataframes = load_or_create_dataframes()
 
+df_aluno = dataframes['df_aluno']
+df_escola = dataframes['df_escola']
+df_prova = dataframes['df_prova']
+df_gabarito = dataframes['df_gabarito']
 # Botões de navegação
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
+    st.image("logo-evolutiva.jpg", use_column_width=False, width=145)
+
+with col2:
     with st.expander("Cadastro", expanded=False): 
         st.write("Selecione uma das opções abaixo:")
         if st.button("Aluno", key="cadastro_aluno", use_container_width=True):
@@ -35,7 +46,7 @@ with col1:
         if st.button("Gabarito", key="cadastro_gabarito", use_container_width=True):
             st.session_state.page = "cadastro_gabarito"
 
-with col2:
+with col3:
     with st.expander("Consulta", expanded=False): 
         st.write("Selecione uma das opções abaixo:")
         if st.button("Geral", key="consulta_geral", use_container_width=True):
@@ -53,7 +64,7 @@ with col2:
         if st.button("Aluno", key="consulta_aluno", use_container_width=True):
             st.session_state.page = "consulta_aluno"
 
-with col3:
+with col4:
     with st.expander("Material Didático", expanded=False):
         st.write("Selecione uma das opções abaixo:")
         if st.button("E-books", key="material_ebooks", use_container_width=True):
@@ -63,7 +74,7 @@ with col3:
         if st.button("Exercícios Práticos", key="material_exercicios", use_container_width=True):
             st.session_state.page = "material_exercicios"
 
-with col4:
+with col5:
     with st.expander("Pedagógico", expanded=False):
         st.write("Selecione uma das opções abaixo:")
         if st.button("Cronograma", key="pedagogico_cronograma", use_container_width=True):
@@ -71,7 +82,7 @@ with col4:
         if st.button("Conteúdo Programático", key="pedagogico_conteudo", use_container_width=True):
             st.session_state.page = "pedagogico_conteudo"
 
-with col5:
+with col6:
     with st.expander("Acesso", expanded=False):
         st.write("Selecione uma das opções abaixo:")
         if st.button("Gestor", key="acesso_gestor", use_container_width=True):
@@ -168,6 +179,28 @@ if st.session_state.page == "cadastro_aluno":
                 st.write(f"**Laudo Médico/Especialista:** {', '.join(laudo_selecionado) if laudo_selecionado else 'Nenhum'}")
                 if "Outros" in laudo_selecionado and outros_laudo:
                     st.write(f"**Outros (especificação):** {outros_laudo}")
+
+                dataframes = load_or_create_dataframes()
+                # Gerar um ID único para o aluno
+                id_aluno = len(df_aluno) + 1 if not df_aluno.empty else 1
+
+                # Criar um dicionário com os dados do aluno
+                novo_aluno = {
+                    "id_aluno": id_aluno,
+                    "nomeAluno": nome,
+                    "dataNascimento": data_nascimento.strftime('%Y-%m-%d'),
+                    "genero": genero,
+                    "serie": serie,
+                    "nomeEscola": nome_escola,
+                    "localizacaoEscola": zona,
+                    "laudoMedico": ", ".join(laudo_selecionado) if laudo_selecionado else None
+                }
+
+                # Adicionar o novo aluno ao dataframe
+                df_aluno = pd.concat([df_aluno, pd.DataFrame([novo_aluno])], ignore_index=True)
+
+                # Exibir mensagem de sucesso
+                st.write("Aluno cadastrado com sucesso no sistema!")
 
 if st.session_state.page == "cadastro_escola":
     st.title("Cadastro de Escola")
@@ -347,12 +380,7 @@ if st.session_state.page == "consulta_geral":
     # Exemplo de campos:
      # Carregar ou criar os dataframes
     with st.spinner("Carregando dados..."):
-        dataframes = create_dataframes()
-    
-    df_aluno = dataframes['df_aluno']
-    df_escola = dataframes['df_escola']
-    df_prova = dataframes['df_prova']
-    df_gabarito = dataframes['df_gabarito']
+        dataframes = load_or_create_dataframes()
     
     # Calcular métricas de desempenho
     with st.spinner("Calculando desempenho..."):
@@ -750,7 +778,13 @@ if st.session_state.page == "material_videos":
     st.title("Material Didático - Vídeos")
     st.write("Esta página é para o acesso a vídeos.")
     # Adicione aqui o código para o acesso a vídeos
-    st.video("https://youtu.be/ZR_Ou01WsK0?si=cKVZa4We_CCCiBHU")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.video("https://youtu.be/ZR_Ou01WsK0?si=cKVZa4We_CCCiBHU")
+
+    with col2:
+        st.video("https://www.youtube.com/watch?v=C00IHVngcfo")
 
 if st.session_state.page == "material_exercicios":
     st.title("Material Didático - Exercícios Práticos")
