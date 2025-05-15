@@ -5,7 +5,7 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.data_manager import create_dataframes, load_or_create_dataframes, calcular_desempenho
+from utils.data_manager import create_dataframes, load_or_create_dataframes, calcular_desempenho, save_dataframes
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -201,6 +201,9 @@ if st.session_state.page == "cadastro_aluno":
 
                 # Exibir mensagem de sucesso
                 st.write("Aluno cadastrado com sucesso no sistema!")
+                st.write("#### DataFrame de Alunos Atualizado:")
+                st.dataframe(df_aluno, use_container_width=True)
+                save_dataframes({'df_aluno': df_aluno, 'df_escola': df_escola, 'df_prova': dataframes['df_prova'], 'df_gabarito': dataframes['df_gabarito']})
 
 if st.session_state.page == "cadastro_escola":
     st.title("Cadastro de Escola")
