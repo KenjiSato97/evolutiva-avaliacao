@@ -229,11 +229,39 @@ if st.session_state.page == "cadastro_escola":
                 st.write(f"**Endereço:** {endereco}")
                 st.write(f"**Telefone:** {telefone}")
                 st.write(f"**Email:** {email}")
+            
+                # Adicionar lógica para salvar os dados no banco de dados ou em um arquivo
+                dataframes = load_or_create_dataframes()
+                # Gerar um ID único para a escola
+                id_escola = len(df_escola) + 1 if not df_escola.empty else 1
+
+                # Criar um dicionário com os dados da escola
+                nova_escola = {
+                    "id_escola": id_escola,
+                    "nomeEscola": nome_escola,
+                    "endereco": endereco,
+                    "telefone": telefone,
+                    "email": email
+                }
+
+                # Adicionar a nova escola ao dataframe
+                df_escola = pd.concat([df_escola, pd.DataFrame([nova_escola])], ignore_index=True)
+
+                # Exibir mensagem de sucesso
+                st.write("Escola cadastrada com sucesso no sistema!")
+                st.write("#### DataFrame de Escolas Atualizado:")
+                st.dataframe(df_escola, use_container_width=True)
+                save_dataframes({'df_aluno': df_aluno, 'df_escola': df_escola, 'df_prova': dataframes['df_prova'], 'df_gabarito': dataframes['df_gabarito']})
 
 if st.session_state.page == "cadastro_prova":
     st.title("Cadastro de Prova")
+    
+
+    # Informações do Aluno
+    st.subheader("Informações do Aluno")
+    # ID do Aluno
+    id_aluno = st.text_input("ID do Aluno", placeholder="Digite o ID do aluno")
     # Nome do Aluno
-    st.subheader("Nome do Aluno")
     nome_aluno = st.text_input("Nome do Aluno", placeholder="Digite o nome completo")
     # Área de Conhecimento e Matéria
     st.subheader("Áreas de Conhecimento")
@@ -280,16 +308,47 @@ if st.session_state.page == "cadastro_prova":
 
     if submitted:
         # Verifica se o nome do aluno foi preenchido
-        if not nome_aluno or materia_selecionada == "Selecione uma matéria"  or serie_prova == "Selecione uma série":
+        if not id_aluno or not nome_aluno or materia_selecionada == "Selecione uma matéria"  or serie_prova == "Selecione uma série":
            st.error("Por favor, preencha todos os campos obrigatórios.")
         else:  
             st.success("Respostas enviadas com sucesso!")
             st.write("### Resumo do Cadastro")
+            st.write(f"**ID do Aluno:** {id_aluno}")
             st.write(f"**Nome do Aluno:** {nome_aluno}")
             st.write(f"**Matéria:** {materia_selecionada}")
             st.write(f"**Série:** {serie_prova}")
             for questao, resposta in questoes.items():
                 st.write(f"**{questao}:** {resposta}")
+
+            # Adicionar lógica para salvar os dados no banco de dados ou em um arquivo
+            dataframes = load_or_create_dataframes()
+            # Gerar um ID único para a escola
+            id_prova = len(df_prova) + 1 if not df_prova.empty else 1
+            # Criar um dicionário com os dados da prova
+            nova_prova = {
+                "id_prova": id_prova,
+                "id_aluno": id_aluno,
+                "nomeAluno": nome_aluno,
+                "materia": materia_selecionada,
+                "serie": serie_prova,
+                "questao_1": questoes["Questão 1"],
+                "questao_2": questoes["Questão 2"],
+                "questao_3": questoes["Questão 3"],
+                "questao_4": questoes["Questão 4"],
+                "questao_5": questoes["Questão 5"],
+                "questao_6": questoes["Questão 6"],
+                "questao_7": questoes["Questão 7"],
+                "questao_8": questoes["Questão 8"],
+                "questao_9": questoes["Questão 9"],
+                "questao_10": questoes["Questão 10"]
+            }
+            # Adicionar a nova escola ao dataframe
+            df_prova = pd.concat([df_prova, pd.DataFrame([nova_prova])], ignore_index=True)
+            # Exibir mensagem de sucesso
+            st.write("Prova cadastrada com sucesso no sistema!")
+            st.write("#### DataFrame de Provas Atualizado:")
+            st.dataframe(df_prova, use_container_width=True)
+            save_dataframes({'df_aluno': df_aluno, 'df_escola': df_escola, 'df_prova': df_prova, 'df_gabarito': df_gabarito})
 
 if st.session_state.page == "cadastro_gabarito":
     st.title("Cadastro de Gabarito")
