@@ -142,7 +142,13 @@ if st.session_state.page == "cadastro_aluno":
             serie = st.selectbox("Série", options=["Selecione uma série", "1º Ano", "2º Ano", "3º Ano", "4º Ano", "5º Ano", "6º Ano", "7º Ano", "8º Ano", "9º Ano", "1º Ano Médio", "2º Ano    Médio", "3º Ano Médio"])
 
         # Nome da Escola
-        nome_escola = st.text_input("Nome da Escola", placeholder="Digite o nome da escola")
+        if not df_escola.empty:
+            nome_escola = st.selectbox(
+            "Nome da Escola",
+            options=["Selecione a escola"] + df_escola["nomeEscola"].dropna().unique().tolist()
+            )
+        else:
+            nome_escola = st.text_input("Nome da Escola", placeholder="Digite o nome da escola")
 
         col1, col2 = st.columns(2)
 
@@ -260,9 +266,18 @@ if st.session_state.page == "cadastro_prova":
     # Informações do Aluno
     st.subheader("Informações do Aluno")
     # ID do Aluno
-    id_aluno = st.text_input("ID do Aluno", placeholder="Digite o ID do aluno")
+    id_aluno = st.selectbox(
+        "ID do Aluno",
+        options=df_aluno["id_aluno"].tolist() if not df_aluno.empty else [],
+        placeholder="Selecione o ID do aluno"
+    )
     # Nome do Aluno
-    nome_aluno = st.text_input("Nome do Aluno", placeholder="Digite o nome completo")
+    # Buscar o nome do aluno automaticamente pelo ID selecionado
+    if id_aluno:
+        nome_aluno = df_aluno.loc[df_aluno["id_aluno"] == id_aluno, "nomeAluno"].values[0] if not df_aluno.empty and id_aluno in df_aluno["id_aluno"].values else ""
+    else:
+        nome_aluno = ""
+    st.text_input("Nome do Aluno", value=nome_aluno, disabled=True)
     # Área de Conhecimento e Matéria
     st.subheader("Áreas de Conhecimento")
     col1, col2 = st.columns(2)
@@ -342,7 +357,7 @@ if st.session_state.page == "cadastro_prova":
                 "questao_9": questoes["Questão 9"],
                 "questao_10": questoes["Questão 10"]
             }
-            # Adicionar a nova escola ao dataframe
+            # Adicionar a nova prova ao dataframe
             df_prova = pd.concat([df_prova, pd.DataFrame([nova_prova])], ignore_index=True)
             # Exibir mensagem de sucesso
             st.write("Prova cadastrada com sucesso no sistema!")
