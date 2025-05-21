@@ -37,6 +37,7 @@ def create_dataframes():
         "questao_1", "questao_2", "questao_3", "questao_4", "questao_5", 
         "questao_6", "questao_7", "questao_8", "questao_9", "questao_10"
     ])
+    df_aluno['id_aluno'] = df_aluno['id_aluno'].astype(int)
     
     return {
         'df_aluno': df_aluno,

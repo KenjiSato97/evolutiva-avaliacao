@@ -407,6 +407,34 @@ if st.session_state.page == "cadastro_gabarito":
             for questao, resposta in questoes.items():
                 st.write(f"**{questao}:** {resposta}")
 
+            # Adicionar lógica para salvar os dados no banco de dados ou em um arquivo
+            dataframes = load_or_create_dataframes()
+            # Gerar um ID único para a escola
+            id_gabarito = len(df_gabarito) + 1 if not df_gabarito.empty else 1
+            # Criar um dicionário com os dados da prova
+            novo_gabarito = {
+                "id_gabarito": id_gabarito,
+                "materia": materia_selecionada,
+                "serie": serie_prova,
+                "questao_1": questoes["Questão 1"],
+                "questao_2": questoes["Questão 2"],
+                "questao_3": questoes["Questão 3"],
+                "questao_4": questoes["Questão 4"],
+                "questao_5": questoes["Questão 5"],
+                "questao_6": questoes["Questão 6"],
+                "questao_7": questoes["Questão 7"],
+                "questao_8": questoes["Questão 8"],
+                "questao_9": questoes["Questão 9"],
+                "questao_10": questoes["Questão 10"]
+            }
+            # Adicionar a nova escola ao dataframe
+            df_gabarito = pd.concat([df_gabarito, pd.DataFrame([novo_gabarito])], ignore_index=True)
+            # Exibir mensagem de sucesso
+            st.write("Gabarito cadastrado com sucesso no sistema!")
+            st.write("#### DataFrame de Gabaritos Atualizado:")
+            st.dataframe(df_gabarito, use_container_width=True)
+            save_dataframes({'df_aluno': df_aluno, 'df_escola': df_escola, 'df_prova': df_prova, 'df_gabarito': df_gabarito})
+
 if st.session_state.page == "consulta_aluno":
     st.title("Consulta de Aluno")
     st.write("Esta página é para a consulta de alunos.")
@@ -503,6 +531,16 @@ if st.session_state.page == "consulta_geral":
             ax.pie(localizacao_counts, labels=localizacao_counts.index, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             st.pyplot(fig)
+
+        st.subheader("DataFrames do Sistema")
+        st.write("**DataFrame de Escolas:**")
+        st.dataframe(df_escola, use_container_width=True)
+        st.write("**DataFrame de Alunos:**")
+        st.dataframe(df_aluno, use_container_width=True)
+        st.write("**DataFrame de Provas:**")
+        st.dataframe(df_prova, use_container_width=True)
+        st.write("**DataFrame de Gabaritos:**")
+        st.dataframe(df_gabarito, use_container_width=True)
     
     #--------------------------
     # TAB 2: DESEMPENHO POR MATÉRIA
