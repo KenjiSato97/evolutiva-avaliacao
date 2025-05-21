@@ -32,7 +32,7 @@ if "page" not in st.session_state:
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    st.image("logo-evolutiva.jpg", use_column_width=False, width=145)
+    st.image("logo-evolutiva.jpg", use_container_width=False, width=145)
 
 with col2:
     with st.expander("Cadastro", expanded=False): 
